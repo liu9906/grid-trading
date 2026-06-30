@@ -3456,14 +3456,19 @@
         });
       }
 
-      // 如果有选中的基金，自动加载走势图 + 自动获取最新净值
+      // 如果有选中的基金，自动选中并渲染详情 + 自动获取最新净值
       const data = getData();
       if (data.currentFundIndex >= 0 && data.currentFundIndex < data.funds.length) {
-        const fund = data.funds[data.currentFundIndex];
-        // 每次打开页面都自动获取最新净值
-        setTimeout(() => refreshCurrentFundNav(), 500);
-        // 加载走势图
-        setTimeout(() => fetchAndRenderChart(true), 1200);
+        // 先选中基金（这会调用 renderFundDetail()，创建 refreshNavBtn 按钮）
+        selectFund(data.currentFundIndex);
+        
+        // 延迟一点，确保 renderFundDetail() 已经完成，按钮已创建
+        setTimeout(() => {
+          // 自动获取最新净值
+          refreshCurrentFundNav();
+          // 加载走势图
+          fetchAndRenderChart(true);
+        }, 800);
       }
     });
 
