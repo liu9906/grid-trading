@@ -953,6 +953,7 @@
           <div style="display:flex; gap:8px; align-items:center;">
             <span id="lastUpdateTime" style="font-size:12px; color:var(--text-light);"></span>
             <button class="btn btn-sm btn-warning" id="refreshNavBtn" onclick="refreshCurrentFundNav()">🔄 刷新净值</button>
+            <button class="btn btn-sm" style="background:#6b7280;color:#fff;" onclick="testNavAPI()" title="测试净值接口（调试用）">🧪 测试接口</button>
             <button class="btn btn-sm btn-danger" onclick="deleteCurrentFund()">删除该基金</button>
             <button class="btn btn-sm btn-primary" onclick="openGridConfigModal()">修改参数</button>
           </div>
@@ -3235,6 +3236,39 @@
         showToast('⚠️ 没有可计算的批次', 'error');
       }
     }
+
+    // ============================================================
+    // 测试净值接口（调试用）
+    // ============================================================
+    window.testNavAPI = function(code) {
+      const fundCode = code || (() => {
+        const data = getData();
+        if (data.currentFundIndex >= 0 && data.funds[data.currentFundIndex]) {
+          return data.funds[data.currentFundIndex].code;
+        }
+        return null;
+      })();
+
+      if (!fundCode) { alert('请先选择基金'); return; }
+
+      alert(`正在测试接口...\n\n基金代码: ${fundCode}\n\n请在控制台(F12)查看详细日志`);
+      console.log('🧪 开始测试净值接口，基金代码:', fundCode);
+
+      const script = document.createElement('script');
+      window.jsonpgz = (data) => {
+        console.log('✅ 接口返回原始数据:', data);
+        const msg = `接口返回数据:\n\n基金: ${data.name}\n基金代码: ${data.fundcode}\n净值日期(jzrq): ${data.jzrq}\n公布净值(dwjz): ${data.dwjz}\n估算净值(gsz): ${data.gsz}\n估算增长率(gszzl): ${data.gszzl}%\n估算时间(gztime): ${data.gztime}\n\n完整数据已打印到控制台(F12)`;
+        alert(msg);
+        cleanup();
+      };
+      function cleanup() {
+        delete window.jsonpgz;
+        if (script.parentNode) script.parentNode.removeChild(script);
+      }
+      script.onerror = () => { cleanup(); alert('❌ 请求失败：网络错误'); };
+      script.src = `https://fundgz.1234567.com.cn/js/${fundCode}.js?rt=${Date.now()}`;
+      document.body.appendChild(script);
+    };
 
     // ============================================================
     // 刷新当前基金净值 + 自动更新批次
