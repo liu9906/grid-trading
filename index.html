@@ -2576,23 +2576,81 @@
     // ============================================================
     // 获取基金净值（天天基金 JSONP / 腾讯行情 JSONP）
     // ============================================================
-    function fetchFundNavJsonp(code) {
+    // ============================================================
+    // 获取最新净值（使用pingzhongdata接口，数据最准确）
+    // ============================================================
+    function fetchLatestNav(code) {
       return new Promise((resolve, reject) => {
         const script = document.createElement('script');
-        // 使用 HTTPS（页面是 HTTPS，HTTP 请求会被浏览器阻止）
+        script.src = `https://fund.eastmoney.com/pingzhongdata/${code}.js?t=${Date.now()}`;
+
+        // 清理函数
+        function cleanup() {
+          if (script.parentNode) script.parentNode.removeChild(script);
+          try { delete window.Data_netWorthTrend; } catch(e) {}
+        }
+
+        const timeout = setTimeout(() => {
+          cleanup();
+          // 超时，尝试备用接口
+          fetchFundNavJsonpFallback(code).then(resolve).catch(reject);
+        }, 15000);
+
+        script.onload = () => {
+          clearTimeout(timeout);
+          try {
+            const netWorthTrend = window.Data_netWorthTrend || [];
+            if (netWorthTrend.length === 0) {
+              cleanup();
+              fetchFundNavJsonpFallback(code).then(resolve).catch(reject);
+              return;
+            }
+
+            // 获取最后一个数据点（最新净值）
+            const latest = netWorthTrend[netWorthTrend.length - 1];
+            const date = new Date(latest.x);
+            const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+            const nav = parseFloat(latest.y) || 0;
+
+            console.log(`✅ pingzhongdata接口返回 - 日期: ${dateStr}, 净值: ${nav}`);
+
+            // 同时尝试获取基金名称
+            let fundName = '';
+            try { fundName = window.fS_name || ''; } catch(e) {}
+
+            cleanup();
+            resolve({
+              price: nav,
+              date: dateStr,
+              name: fundName
+            });
+          } catch(e) {
+            cleanup();
+            fetchFundNavJsonpFallback(code).then(resolve).catch(reject);
+          }
+        };
+
+        script.onerror = () => {
+          clearTimeout(timeout);
+          cleanup();
+          fetchFundNavJsonpFallback(code).then(resolve).catch(reject);
+        };
+
+        document.body.appendChild(script);
+      });
+    }
+
+    // 备用方法：使用 fundgz 接口
+    function fetchFundNavJsonpFallback(code) {
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
         const apiUrl = `https://fundgz.1234567.com.cn/js/${code}.js?rt=${Date.now()}`;
         window.jsonpgz = (data) => {
-          console.log('✅ 净值接口返回数据:', data);
-          if (!data || !data.dwjz) {
-            reject(new Error('接口返回数据格式异常，请手动输入净值'));
-            cleanup();
-            return;
-          }
+          console.log('⚠️ 使用备用接口(fundgz)，数据可能有延迟:', data);
           resolve({
             price: parseFloat(data.dwjz) || 0,
-            name: data.name || '',
-            navDate: data.jzrq || '',
-            estimateNav: parseFloat(data.gsz) || 0
+            date: data.jzrq || '',
+            name: data.name || ''
           });
           cleanup();
         };
@@ -2600,10 +2658,10 @@
           delete window.jsonpgz;
           if (script.parentNode) script.parentNode.removeChild(script);
         }
-        script.onerror = () => { cleanup(); reject(new Error('网络错误，请检查网络连接')); };
+        script.onerror = () => { cleanup(); reject(new Error('所有接口都失败，请手动输入净值')); };
         script.src = apiUrl;
         document.body.appendChild(script);
-        setTimeout(() => { cleanup(); reject(new Error('请求超时（15秒），请手动输入净值或稍后重试')); }, 15000);
+        setTimeout(() => { cleanup(); reject(new Error('请求超时')); }, 10000);
       });
     }
 
@@ -3282,12 +3340,13 @@
       btn.disabled = true;
       btn.innerHTML = '<span class="loading-spinner"></span>获取中...';
 
-      const task = fund.type === '场外' ? fetchFundNavJsonp(fund.code) : fetchEtfPriceJsonp(fund.code);
+      // 使用新接口获取最新净值（场外基金用fetchLatestNav，场内ETF用fetchEtfPriceJsonp）
+      const task = fund.type === '场外' ? fetchLatestNav(fund.code) : fetchEtfPriceJsonp(fund.code);
 
       task.then(result => {
-        // 只用最新公布净值（dwjz），不用估算净值
+        // 只用最新公布净值，不用估算净值
         const newPrice = result.price;
-        const navDate = result.navDate || '';
+        const navDate = result.date || result.navDate || '';
         const nowStr = new Date().toLocaleString('zh-CN');
 
         fund.nav = newPrice;
