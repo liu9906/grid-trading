@@ -2581,6 +2581,12 @@
         // 使用 HTTPS（页面是 HTTPS，HTTP 请求会被浏览器阻止）
         const apiUrl = `https://fundgz.1234567.com.cn/js/${code}.js?rt=${Date.now()}`;
         window.jsonpgz = (data) => {
+          console.log('✅ 净值接口返回数据:', data);
+          if (!data || !data.dwjz) {
+            reject(new Error('接口返回数据格式异常，请手动输入净值'));
+            cleanup();
+            return;
+          }
           resolve({
             price: parseFloat(data.dwjz) || 0,
             name: data.name || '',
@@ -2593,10 +2599,10 @@
           delete window.jsonpgz;
           if (script.parentNode) script.parentNode.removeChild(script);
         }
-        script.onerror = () => { cleanup(); reject(new Error('网络错误，请手动输入净值')); };
+        script.onerror = () => { cleanup(); reject(new Error('网络错误，请检查网络连接')); };
         script.src = apiUrl;
         document.body.appendChild(script);
-        setTimeout(() => { cleanup(); reject(new Error('请求超时，请手动输入净值')); }, 15000);
+        setTimeout(() => { cleanup(); reject(new Error('请求超时（15秒），请手动输入净值或稍后重试')); }, 15000);
       });
     }
 
@@ -3263,7 +3269,9 @@
       }).catch(err => {
         btn.disabled = false;
         btn.innerHTML = '🔄 刷新净值';
-        showToast(`❌ 获取失败：${err.message || err}（可手动输入净值）`, 'error');
+        const errorMsg = err.message || err || '未知错误';
+        console.error('❌ 获取净值失败:', errorMsg);
+        showToast(`❌ 获取失败：${errorMsg}\n\n请尝试：1)刷新页面重试 2)手动输入净值`, 'error');
       });
     }
 
