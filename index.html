@@ -1417,6 +1417,8 @@
       // 切换基金后自动获取历史数据并渲染走势图
       currentChartData = null;
       setTimeout(() => fetchAndRenderChart(true), 150);
+      // 切换基金后自动刷新净值（延迟一点确保renderFundDetail已完成）
+      setTimeout(() => refreshCurrentFundNav(), 300);
     }
 
     // ============================================================
