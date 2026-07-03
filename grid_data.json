@@ -1,0 +1,90 @@
+{
+  "funds": [
+    {
+      "name": "易方达中证1000量化增强A",
+      "code": "017094",
+      "type": "场外",
+      "nav": null,
+      "return1m": null,
+      "return1y": null,
+      "logic": "",
+      "category": "",
+      "risk": "",
+      "grid": {
+        "width": 0.05,
+        "takeProfit": 0.1,
+        "amount": 1000.0,
+        "basePrice": null
+      },
+      "batches": [
+        {
+          "date": "2026-06-18",
+          "firstBuyPrice": 1.7707,
+          "unitAmount": 1000.0,
+          "gridLine": 1.6822,
+          "note": "6月18日买入，买入价1.7707",
+          "subRecords": [],
+          "expanded": false
+        }
+      ]
+    },
+    {
+      "name": "易方达安心回报债券B",
+      "code": "110028",
+      "type": "场外",
+      "nav": null,
+      "return1m": null,
+      "return1y": null,
+      "logic": "",
+      "category": "",
+      "risk": "",
+      "grid": {
+        "width": 0.05,
+        "takeProfit": 0.1,
+        "amount": 1000.0,
+        "basePrice": null
+      },
+      "batches": [
+        {
+          "date": "2026-06-18",
+          "firstBuyPrice": 2.3088,
+          "unitAmount": 1000.0,
+          "gridLine": 2.1934,
+          "note": "6月18日买入，买入价2.3088",
+          "subRecords": [],
+          "expanded": false
+        }
+      ]
+    },
+    {
+      "name": "广发科创50ETF发起式联接C",
+      "code": "013811",
+      "type": "场外",
+      "nav": null,
+      "return1m": null,
+      "return1y": null,
+      "logic": "",
+      "category": "",
+      "risk": "",
+      "grid": {
+        "width": 0.05,
+        "takeProfit": 0.1,
+        "amount": 1000.0,
+        "basePrice": null
+      },
+      "batches": [
+        {
+          "date": "2026-06-18",
+          "firstBuyPrice": 1.3144,
+          "unitAmount": 1000.0,
+          "gridLine": 1.2487,
+          "note": "6月18日买入，买入价1.3144",
+          "subRecords": [],
+          "expanded": false
+        }
+      ]
+    }
+  ],
+  "currentFundIndex": 0,
+  "lastSync": "2026-07-03 02:17:32"
+}
