@@ -1414,10 +1414,8 @@
       data.currentFundIndex = index;
       saveData(data);
       renderFundSelector();
-      // 切换基金后自动获取历史数据并渲染走势图
+      // 切换基金后自动刷新净值（内部会调用fetchPingzhongData，一次获取净值+收益率+走势图）
       currentChartData = null;
-      setTimeout(() => fetchAndRenderChart(true), 150);
-      // 切换基金后自动刷新净值（延迟一点确保renderFundDetail已完成）
       setTimeout(() => refreshCurrentFundNav(), 300);
     }
 
@@ -3331,7 +3329,7 @@
     };
 
     // ============================================================
-    // 刷新当前基金净值 + 自动更新批次
+    // 刷新当前基金净值 + 自动更新批次 + 收益率
     // ============================================================
     function refreshCurrentFundNav() {
       const data = getData();
@@ -3339,34 +3337,82 @@
       if (idx < 0 || idx >= data.funds.length) return;
       const fund = data.funds[idx];
       const btn = document.getElementById('refreshNavBtn');
-      btn.disabled = true;
-      btn.innerHTML = '<span class="loading-spinner"></span>获取中...';
+      if (btn) { btn.disabled = true; btn.innerHTML = '<span class="loading-spinner"></span>获取中...'; }
 
-      // 使用新接口获取最新净值（场外基金用fetchLatestNav，场内ETF用fetchEtfPriceJsonp）
-      const task = fund.type === '场外' ? fetchLatestNav(fund.code) : fetchEtfPriceJsonp(fund.code);
+      // 场内ETF用fetchEtfPriceJsonp，场外基金用fetchPingzhongData（一次请求同时获取净值+收益率）
+      if (fund.type === '场内') {
+        fetchEtfPriceJsonp(fund.code).then(result => {
+          const newPrice = result.price;
+          const nowStr = new Date().toLocaleString('zh-CN');
+          fund.nav = newPrice;
+          fund.lastUpdate = nowStr;
+          if (result.name) fund.name = result.name;
+          saveData(data);
+          renderFundDetail();
+          if (btn) { btn.disabled = false; btn.innerHTML = '🔄 刷新净值'; }
+          showToast(`✅ ${fund.name} 价格 ${newPrice.toFixed(4)}`, 'success');
+        }).catch(err => {
+          if (btn) { btn.disabled = false; btn.innerHTML = '🔄 刷新净值'; }
+          showToast(`❌ 获取失败：${err.message || err}`, 'error');
+        });
+        return;
+      }
 
-      task.then(result => {
-        // 只用最新公布净值，不用估算净值
-        const newPrice = result.price;
-        const navDate = result.date || result.navDate || '';
+      // 场外基金：使用pingzhongdata接口，一次获取净值+收益率
+      fetchPingzhongData(fund.code).then(result => {
+        const allData = result.allData || [];
+        if (allData.length === 0) throw new Error('净值数据为空');
+
+        // 取最后一条作为最新净值
+        const latest = allData[allData.length - 1];
+        const newPrice = latest.netValue;
+        const navDate = latest.date;
         const nowStr = new Date().toLocaleString('zh-CN');
 
         fund.nav = newPrice;
         fund.navDate = navDate;
         fund.lastUpdate = nowStr;
-        if (result.name) fund.name = result.name;
+        if (result.fundName) fund.name = result.fundName;
+
+        // 同时更新收益率
+        let updated = false;
+        if (result.syl_1y !== undefined && !isNaN(parseFloat(result.syl_1y))) {
+          fund.return1m = parseFloat(result.syl_1y); updated = true;
+        }
+        if (result.syl_1n !== undefined && !isNaN(parseFloat(result.syl_1n))) {
+          fund.return1y = parseFloat(result.syl_1n); updated = true;
+        }
 
         saveData(data);
         renderFundDetail();
-        btn.disabled = false;
-        btn.innerHTML = '🔄 刷新净值';
-        showToast(`✅ ${fund.name} 净值 ${newPrice.toFixed(4)}（${navDate}公布）`, 'success');
+
+        // 如果有图表数据，同时渲染走势图
+        currentChartData = result;
+        renderNavChart(result, currentTimeRange);
+
+        if (btn) { btn.disabled = false; btn.innerHTML = '🔄 刷新净值'; }
+        const retInfo = updated ? '，收益率已更新' : '';
+        showToast(`✅ ${fund.name} 净值 ${newPrice.toFixed(4)}（${navDate}公布）${retInfo}`, 'success');
       }).catch(err => {
-        btn.disabled = false;
-        btn.innerHTML = '🔄 刷新净值';
-        const errorMsg = err.message || err || '未知错误';
-        console.error('❌ 获取净值失败:', errorMsg);
-        showToast(`❌ 获取失败：${errorMsg}\n\n请尝试：1)刷新页面重试 2)手动输入净值`, 'error');
+        // pingzhongdata失败，尝试备用接口
+        fetchFundNavJsonpFallback(fund.code).then(result => {
+          const newPrice = result.price;
+          const navDate = result.date || '';
+          const nowStr = new Date().toLocaleString('zh-CN');
+          fund.nav = newPrice;
+          fund.navDate = navDate;
+          fund.lastUpdate = nowStr;
+          if (result.name) fund.name = result.name;
+          saveData(data);
+          renderFundDetail();
+          if (btn) { btn.disabled = false; btn.innerHTML = '🔄 刷新净值'; }
+          showToast(`✅ ${fund.name} 净值 ${newPrice.toFixed(4)}（${navDate}公布）`, 'success');
+        }).catch(err2 => {
+          if (btn) { btn.disabled = false; btn.innerHTML = '🔄 刷新净值'; }
+          const errorMsg = err2.message || err2 || '未知错误';
+          console.error('❌ 获取净值失败:', errorMsg);
+          showToast(`❌ 获取失败：${errorMsg}`, 'error');
+        });
       });
     }
 
@@ -3465,12 +3511,8 @@
         selectFund(data.currentFundIndex);
         
         // 延迟一点，确保 renderFundDetail() 已经完成，按钮已创建
-        setTimeout(() => {
-          // 自动获取最新净值
-          refreshCurrentFundNav();
-          // 加载走势图
-          fetchAndRenderChart(true);
-        }, 800);
+        // refreshCurrentFundNav 内部会调用 fetchPingzhongData，一次请求同时获取净值+收益率+走势图
+        setTimeout(() => refreshCurrentFundNav(), 800);
       }
     });
 
