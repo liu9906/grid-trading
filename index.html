@@ -1381,36 +1381,51 @@
     });
 
     // ============================================================
-    // 基金选择器
+    // 基金选择器（只显示有持仓批次的基金，无批次的归入产品库）
     // ============================================================
     function renderFundSelector() {
       const data = getData();
       const container = document.getElementById('fundSelector');
       const countEl = document.getElementById('fundCount');
 
-      countEl.textContent = data.funds.length + ' 只';
+      // 只显示有持仓批次的基金
+      const activeFunds = data.funds.filter(f => f.batches && f.batches.length > 0);
 
-      if (data.funds.length === 0) {
+      countEl.textContent = activeFunds.length + ' 只';
+
+      if (activeFunds.length === 0) {
         container.innerHTML = `
           <div class="empty-state" style="padding:20px; width:100%;">
             <div class="icon">📊</div>
-            <div>暂无基金，请点击"导入产品"或"添加基金"</div>
+            <div>暂无持仓基金，请点击"导入产品"或"添加基金"</div>
           </div>`;
         document.getElementById('fundDetail').style.display = 'none';
         return;
       }
 
       let html = '';
-      data.funds.forEach((f, idx) => {
-        const active = idx === data.currentFundIndex ? 'active' : '';
+      activeFunds.forEach((f) => {
+        // 找到该基金在原数组中的真实索引
+        const origIdx = data.funds.findIndex(ff => ff.code === f.code);
+        const active = origIdx === data.currentFundIndex ? 'active' : '';
         html += `
-          <div class="fund-chip ${active}" onclick="selectFund(${idx})">
+          <div class="fund-chip ${active}" onclick="selectFund(${origIdx})">
             <span>${f.name}</span>
             <span class="code">${f.code}</span>
           </div>
         `;
       });
       container.innerHTML = html;
+
+      // 如果当前选中的基金没有批次，自动切换到第一只有批次的基金
+      const currentFund = data.funds[data.currentFundIndex];
+      if (!currentFund || !currentFund.batches || currentFund.batches.length === 0) {
+        if (activeFunds.length > 0) {
+          const firstActiveIdx = data.funds.findIndex(f => f.batches && f.batches.length > 0);
+          data.currentFundIndex = firstActiveIdx;
+          saveData(data);
+        }
+      }
 
       if (data.currentFundIndex >= 0 && data.currentFundIndex < data.funds.length) {
         document.getElementById('fundDetail').style.display = 'block';
