@@ -2174,20 +2174,25 @@
     function calcBatchSummary(batch, currentNav) {
       const subs = batch.subRecords || [];
       const firstBuyPrice = batch.firstBuyPrice || 0;
+      const unitAmount = batch.unitAmount || 0;
 
       if (subs.length === 0) {
         // 没有追加扣款记录时：使用首次买入价计算简单盈亏率（与钉钉推送保持一致）
         if (firstBuyPrice > 0 && currentNav > 0) {
           const simplePnlRate = (currentNav - firstBuyPrice) / firstBuyPrice;
+          // 有 unitAmount（Excel 导入的购买金额）时，用它算总投入和市值，不再显示 '-'
+          const totalCost = unitAmount > 0 ? unitAmount : 0;
+          const marketValue = totalCost > 0 ? totalCost * (1 + simplePnlRate) : 0;
+          const pnlAmount = marketValue - totalCost;
           return {
-            totalCost: 0,
+            totalCost,
             totalShares: 0,
             avgCost: firstBuyPrice,
-            marketValue: 0,
-            pnlAmount: 0,
+            marketValue,
+            pnlAmount,
             pnlRate: simplePnlRate,
             deductionCount: 0,
-            useSimpleCalc: true  // 标记：使用简单计算模式
+            useSimpleCalc: !totalCost  // 只有真的没金额才标记简单模式
           };
         }
         return { totalCost: 0, totalShares: 0, avgCost: firstBuyPrice, marketValue: 0, pnlAmount: 0, pnlRate: 0, deductionCount: 0, useSimpleCalc: false };
