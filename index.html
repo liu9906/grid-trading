@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>基金网格交易管理台</title>
+  <title>基金网格交易管理台 v2（智能建议版）</title>
   <style>
     :root {
       --primary: #2c5aa0;
@@ -796,8 +796,8 @@
   <div class="header">
     <div class="header-inner">
       <div>
-        <h1>基金网格交易管理台</h1>
-        <div class="subtitle" id="pageSubtitle">多基金网格策略统一管理</div>
+        <h1>基金网格交易管理台 <span style="font-size:14px;background:#10b981;color:#fff;padding:2px 8px;border-radius:4px;vertical-align:middle;">v2 智能建议</span></h1>
+        <div class="subtitle" id="pageSubtitle">多因子智能建议 · 支持日内估算净值</div>
       </div>
       <div class="header-actions">
         <button class="btn btn-secondary btn-sm" onclick="exportToExcel()">📊 导出Excel</button>
@@ -1104,39 +1104,42 @@
     </div>
   </div>
 
-  <!-- 网格参数模态框 -->
-  <div class="modal-overlay" id="gridConfigModal">
-    <div class="modal">
-      <div class="modal-header">
-        <h3>修改网格参数</h3>
-        <button class="modal-close" onclick="closeModal('gridConfigModal')">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-grid">
-          <div class="form-group">
-            <label>下跌网格宽度（如 0.05 = 5%）</label>
-            <input type="number" id="cfgGridWidth" step="0.01" value="0.05">
+    <!-- 网格参数模态框 -->
+    <div class="modal-overlay" id="gridConfigModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>修改网格参数</h3>
+          <button class="modal-close" onclick="closeModal('gridConfigModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:#166534;">
+            💡 <strong>v2 智能建议模式</strong>：买卖建议现由多因子智能引擎自动生成（趋势/动量/估值/仓位等），以下参数仅作为参考，不再自动触发买卖。
           </div>
-          <div class="form-group">
-            <label>止盈目标收益率（如 0.10 = 10%）</label>
-            <input type="number" id="cfgTakeProfit" step="0.01" value="0.10">
-          </div>
-          <div class="form-group">
-            <label>单次买入金额（元）</label>
-            <input type="number" id="cfgAmount" step="100" value="1000">
-          </div>
-          <div class="form-group">
-            <label>基准净值/点位（用于计算首条扣款线）</label>
-            <input type="number" id="cfgBasePrice" step="0.0001" placeholder="留空则使用最新净值">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>下跌网格宽度（如 0.05 = 5%，留空或0则使用智能引擎）</label>
+              <input type="number" id="cfgGridWidth" step="0.01" value="0" placeholder="0=智能引擎">
+            </div>
+            <div class="form-group">
+              <label>止盈目标收益率（如 0.10 = 10%，留空或0则使用智能引擎）</label>
+              <input type="number" id="cfgTakeProfit" step="0.01" value="0" placeholder="0=智能引擎">
+            </div>
+            <div class="form-group">
+              <label>单次买入金额（元）</label>
+              <input type="number" id="cfgAmount" step="100" value="1000">
+            </div>
+            <div class="form-group">
+              <label>基准净值/点位（用于计算首条扣款线）</label>
+              <input type="number" id="cfgBasePrice" step="0.0001" placeholder="留空则使用最新净值">
+            </div>
           </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" onclick="closeModal('gridConfigModal')">取消</button>
-        <button class="btn btn-primary" onclick="saveGridConfig()">保存</button>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeModal('gridConfigModal')">取消</button>
+          <button class="btn btn-primary" onclick="saveGridConfig()">保存</button>
+        </div>
       </div>
     </div>
-  </div>
 
   <!-- 批次编辑模态框 -->
   <div class="modal-overlay" id="batchModal">
@@ -1334,26 +1337,6 @@
         return1m: 8.38,
         return1y: 98.01,
         logic: '跟踪上证科创50指数，投资科创板头部科技企业。聚焦半导体、人工智能、生物医药等硬科技领域。'
-      },
-      {
-        name: '富国中证A500ETF发起式联接C',
-        code: '022464',
-        type: '场外',
-        category: 'A500指数',
-        risk: 'R3中风险',
-        return1m: 1.80,
-        return1y: 30.53,
-        logic: '跟踪中证A500指数，覆盖各行业龙头，兼具价值与成长风格，是新"国九条"后重磅宽基指数，适合核心配置。'
-      },
-      {
-        name: '华安品质甄选混合C',
-        code: '013681',
-        type: '场外',
-        category: '混合型',
-        risk: '中高风险',
-        return1m: 1.54,
-        return1y: 68.15,
-        logic: '灵活配置股票与债券，精选高品质个股，追求长期超额收益。适合有一定风险承受能力的投资者。'
       }
     ];
 
@@ -1361,6 +1344,8 @@
     // 数据存储
     // ============================================================
     const STORAGE_KEY = 'grid_trading_data_v2';
+    const EMBEDDED_DATA = {"funds": [{"name": "广发科创50ETF发起式联接A", "code": "013810", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发沪深300ETF", "code": "510360", "type": "场内", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发中证A500ETF", "code": "563800", "type": "场内", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发创业板ETF", "code": "159952", "type": "场内", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发科创50ETF", "code": "588060", "type": "场内", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发上海金ETF", "code": "518600", "type": "场内", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "招商中证红利ETF联接A", "code": "012643", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "主要投资银行、公用事业、钢铁等传统高股息资产，防御属性突出。利率下行阶段高股息资产防御价值凸显。", "category": "红利指数", "risk": "R3中风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发创业板ETF发起式联接C", "code": "003766", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "定位于服务高成长性、创新型中小企业。行业集中于新能源、数字经济、绿色低碳三大赛道。当前估值位于相对低位。", "category": "创业板指数", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发上海金ETF联接C", "code": "008987", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "全球动荡、地缘政治持续紧张。黄金作为避险资产的作用不断凸显。能有效降低组合回撤。", "category": "另类-黄金", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "易方达中证1000量化增强A", "code": "017094", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "股票型", "risk": "中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-06-18", "firstBuyPrice": 1.7707, "unitAmount": 20000.0, "gridLine": 1.6646, "note": "三明客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "易方达安心回报债券B", "code": "110028", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "债券型", "risk": "中低风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-06-18", "firstBuyPrice": 2.3088, "unitAmount": 20000.0, "gridLine": 2.1785, "note": "三明客户", "subRecords": [], "expanded": false}, {"date": "2026-07-03", "firstBuyPrice": 2.3076, "unitAmount": 1000000.0, "gridLine": 2.1785, "note": "潘天妹客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "广发科创50ETF发起式联接C", "code": "013811", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "存储芯片迎来涨价潮，智能驾驶出租车正式投放。中报业绩向好背景下，科创50聚焦头部硬核科技+软创新，自主可控概念含量高。", "category": "科创50指数", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-07-03", "firstBuyPrice": 1.3646, "unitAmount": 500000.0, "gridLine": 1.2964, "note": "潘天妹客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "招商中证红利ETF联接A", "code": "012643", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "主要投资银行、公用事业、钢铁等传统高股息资产，防御属性突出。利率下行阶段高股息资产防御价值凸显。", "category": "红利指数", "risk": "R3中风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发创业板ETF发起式联接C", "code": "003766", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "定位于服务高成长性、创新型中小企业。行业集中于新能源、数字经济、绿色低碳三大赛道。当前估值位于相对低位。", "category": "创业板指数", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发上海金ETF联接C", "code": "008987", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "全球动荡、地缘政治持续紧张。黄金作为避险资产的作用不断凸显。能有效降低组合回撤。", "category": "另类-黄金", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "易方达中证1000量化增强A", "code": "017094", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "股票型", "risk": "中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-06-18", "firstBuyPrice": 1.7707, "unitAmount": 20000.0, "gridLine": 1.6646, "note": "三明客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "广发科创50ETF发起式联接C", "code": "013811", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "存储芯片迎来涨价潮，智能驾驶出租车正式投放。中报业绩向好背景下，科创50聚焦头部硬核科技+软创新，自主可控概念含量高。", "category": "科创50指数", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-07-03", "firstBuyPrice": 1.3646, "unitAmount": 500000.0, "gridLine": 1.2964, "note": "潘天妹客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "华安品质甄选混合C", "code": "013681", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "混合-偏股", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-07-08", "firstBuyPrice": 1.5715, "unitAmount": 150000.0, "gridLine": 1.4925, "note": "榕管客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "富国中证A500ETF发起式联接C", "code": "022464", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "宽基指数", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-05-25", "firstBuyPrice": 1.3201, "unitAmount": 400000.0, "gridLine": 1.2541, "note": "榕管客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "鹏华产业债债券A", "code": "206018", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [], "strategyMode": "balanced"}], "currentFundIndex": 0, "lastSync": "2026-07-08 10:41:22", "intradayMode": false};
+
 
     function getData() {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -1434,8 +1419,10 @@
       data.currentFundIndex = index;
       saveData(data);
       renderFundSelector();
-      // 切换基金后自动刷新净值（内部会调用fetchPingzhongData，一次获取净值+收益率+走势图）
+      // 切换基金后自动获取历史数据并渲染走势图
       currentChartData = null;
+      setTimeout(() => fetchAndRenderChart(true), 150);
+      // 切换基金后自动刷新净值（延迟一点确保renderFundDetail已完成）
       setTimeout(() => refreshCurrentFundNav(), 300);
     }
 
@@ -1458,9 +1445,11 @@
       document.getElementById('detailTitle').textContent =
         `${fund.name}（${fund.code}）网格参数`;
 
-      // 参数显示
-      document.getElementById('dispGridWidth').value = (fund.grid?.width || 0.05) * 100 + '%';
-      document.getElementById('dispTakeProfit').value = (fund.grid?.takeProfit || 0.10) * 100 + '%';
+      // 参数显示（v2: 网格宽度/止盈目标由智能引擎动态决定，不再显示固定值）
+      const gridWidth = fund.grid?.width || 0;
+      const gridTakeProfit = fund.grid?.takeProfit || 0;
+      document.getElementById('dispGridWidth').value = gridWidth > 0 ? (gridWidth * 100).toFixed(0) + '%' : '智能引擎';
+      document.getElementById('dispTakeProfit').value = gridTakeProfit > 0 ? (gridTakeProfit * 100).toFixed(0) + '%' : '智能引擎';
       document.getElementById('dispAmount').value = (fund.grid?.amount || 1000) + '元';
       document.getElementById('dispBasePrice').value = fund.grid?.basePrice || fund.nav || '-';
 
@@ -1485,8 +1474,9 @@
       let totalInvested = 0;
       let totalMarketValue = 0;
       let totalPnl = 0;
+      const currentNav = fund.currentPrice || fund.nav || 0;
       batches.forEach(b => {
-        const s = calcBatchSummary(b, fund.nav || 0);
+        const s = calcBatchSummary(b, currentNav);
         totalInvested += s.totalCost;
         totalMarketValue += s.marketValue;
         totalPnl += s.pnlAmount;
@@ -1495,18 +1485,37 @@
       document.getElementById('statTotal').textContent = batches.length;
       document.getElementById('statActive').textContent = batches.filter(b => (b.subRecords || []).length > 0).length;
       document.getElementById('statProfit').textContent = '¥' + totalInvested.toFixed(0);
-      document.getElementById('statTodayNav').textContent = fund.nav ? fund.nav.toFixed(4) : '-';
-      document.getElementById('statGridWidth').textContent = ((fund.grid?.width || 0.05) * 100).toFixed(0) + '%';
-      document.getElementById('statTakeProfit').textContent = ((fund.grid?.takeProfit || 0.10) * 100).toFixed(0) + '%';
-      // 显示净值日期（哪天公布的净值）
-      if (fund.navDate) {
-        document.getElementById('navUpdateTime').textContent = `${fund.navDate}公布`;
-        document.getElementById('navDateLabel').textContent = fund.lastUpdate ? `本地更新：${fund.lastUpdate}` : '';
+
+      // 显示当前价格（区分公布净值/估算净值）
+      if (fund.currentPrice) {
+        let navDisplay = fund.currentPrice.toFixed(4);
+        if (fund.estimateNav && fund.priceSource === '估算') {
+          navDisplay = `${fund.estimateNav.toFixed(4)}`;
+        } else if (fund.nav) {
+          navDisplay = `${fund.nav.toFixed(4)}`;
+        }
+        document.getElementById('statTodayNav').textContent = navDisplay;
+        document.getElementById('statTodayNav').title = `当前使用价格: ${fund.priceSource}`;
       } else {
-        document.getElementById('navUpdateTime').textContent = fund.lastUpdate || '';
+        document.getElementById('statTodayNav').textContent = '-';
+      }
+
+      // 显示价格来源标签
+      if (fund.priceSource === '估算') {
+        document.getElementById('navDateLabel').textContent = `⚡ 估算 ${fund.estimateTime || ''}`;
+        document.getElementById('navDateLabel').style.color = '#f59e0b';
+      } else if (fund.navDate) {
+        document.getElementById('navDateLabel').textContent = `${fund.navDate}公布`;
+        document.getElementById('navDateLabel').style.color = '#94a3b8';
+      } else {
         document.getElementById('navDateLabel').textContent = '';
       }
+
       document.getElementById('lastUpdateTime').textContent = fund.lastUpdate ? `最后更新：${fund.lastUpdate}` : '';
+
+      // v2: 不再显示固定网格宽度/止盈目标（由智能引擎决定）
+      document.getElementById('statGridWidth').textContent = '智能';
+      document.getElementById('statTakeProfit').textContent = '智能';
 
       // 收益情况
       const ret1m = fund.return1m, ret1y = fund.return1y;
@@ -1536,7 +1545,9 @@
         return;
       }
 
-      const currentNav = fund.nav || 0;
+      // v2: 使用 currentPrice（可能是日内估算净值）来计算盈亏
+      const currentNav = fund.currentPrice || fund.nav || 0;
+      const priceSource = fund.priceSource || '公布';
       let html = '';
       let currentMonth = '';
       const sorted = [...batches].sort((a, b) => a.date.localeCompare(b.date));
@@ -1553,6 +1564,9 @@
         const pnlClass = summary.pnlRate >= 0 ? 'pnl-up' : 'pnl-down';
         const pnlStr = (summary.pnlRate * 100).toFixed(2) + '%';
 
+        // 简单计算模式标记（无追加扣款记录时，使用首次买入价计算盈亏，与钉钉推送一致）
+        const isSimpleMode = summary.useSimpleCalc;
+
         // 智能操作建议（多因子模型）
         const smartSug = getSmartSuggestion(b, currentNav, currentStrategyMode);
 
@@ -1561,9 +1575,9 @@
             <td><span class="expand-btn ${isExpanded ? 'expanded' : ''}" onclick="toggleBatchExpand(${originalIdx})">▶</span></td>
             <td>${b.date}<br><small style="color:#94a3b8;font-weight:400;">${subs.length}笔扣款</small></td>
             <td>${summary.avgCost > 0 ? summary.avgCost.toFixed(4) : (b.firstBuyPrice ? b.firstBuyPrice.toFixed(4) : '-')}</td>
-            <td>¥${summary.totalCost.toFixed(0)}</td>
-            <td>¥${summary.marketValue.toFixed(0)}</td>
-            <td class="${pnlClass}">${pnlStr}${summary.totalCost > 0 ? '<br><small style="font-weight:400;">¥' + summary.pnlAmount.toFixed(0) + '</small>' : ''}</td>
+            <td>${isSimpleMode ? '<span style="color:#94a3b8;">-</span>' : '¥' + summary.totalCost.toFixed(0)}</td>
+            <td>${isSimpleMode ? '<span style="color:#94a3b8;">-</span>' : '¥' + summary.marketValue.toFixed(0)}</td>
+            <td class="${pnlClass}">${pnlStr}${!isSimpleMode && summary.totalCost > 0 ? '<br><small style="font-weight:400;">¥' + summary.pnlAmount.toFixed(0) + '</small>' : ''}</td>
             <td>${b.gridLine ? b.gridLine.toFixed(4) : '-'}</td>
             <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${(b.note || '').replace(/"/g, '&quot;')}">${b.note || '-'}</td>
             <td style="position:relative;cursor:pointer;" onclick="showSuggestionDetail(event, ${originalIdx})" title="点击查看分析详情">
@@ -1644,7 +1658,8 @@
         return1m: isNaN(return1m) ? undefined : return1m,
         return1y: isNaN(return1y) ? undefined : return1y,
         logic: logic || '',
-        grid: { width: 0.05, takeProfit: 0.10, amount: 1000, basePrice: nav },
+        // v2: 不再使用固定网格宽度/止盈目标，由智能引擎决定
+        grid: { width: 0, takeProfit: 0, amount: 1000, basePrice: nav },
         batches: []
       };
 
@@ -1683,8 +1698,9 @@
       const fund = data.funds[data.currentFundIndex];
       if (!fund) return;
 
-      document.getElementById('cfgGridWidth').value = fund.grid?.width || 0.05;
-      document.getElementById('cfgTakeProfit').value = fund.grid?.takeProfit || 0.10;
+      // v2: 显示当前值，如果为0则显示空（表示使用智能引擎）
+      document.getElementById('cfgGridWidth').value = fund.grid?.width || 0;
+      document.getElementById('cfgTakeProfit').value = fund.grid?.takeProfit || 0;
       document.getElementById('cfgAmount').value = fund.grid?.amount || 1000;
       document.getElementById('cfgBasePrice').value = fund.grid?.basePrice || '';
       openModal('gridConfigModal');
@@ -1695,15 +1711,24 @@
       const fund = data.funds[data.currentFundIndex];
       if (!fund) return;
 
+      const width = parseFloat(document.getElementById('cfgGridWidth').value) || 0;
+      const takeProfit = parseFloat(document.getElementById('cfgTakeProfit').value) || 0;
+
       fund.grid = {
-        width: parseFloat(document.getElementById('cfgGridWidth').value) || 0.05,
-        takeProfit: parseFloat(document.getElementById('cfgTakeProfit').value) || 0.10,
+        width: width,
+        takeProfit: takeProfit,
         amount: parseFloat(document.getElementById('cfgAmount').value) || 1000,
         basePrice: parseFloat(document.getElementById('cfgBasePrice').value) || null
       };
       saveData(data);
       closeModal('gridConfigModal');
       renderFundDetail();
+
+      if (width === 0 && takeProfit === 0) {
+        showToast('✅ 已保存：使用智能引擎生成买卖建议', 'success');
+      } else {
+        showToast('✅ 已保存网格参数（智能引擎仍为主要参考）', 'success');
+      }
     }
 
     // ============================================================
@@ -2148,9 +2173,24 @@
     // ============================================================
     function calcBatchSummary(batch, currentNav) {
       const subs = batch.subRecords || [];
+      const firstBuyPrice = batch.firstBuyPrice || 0;
+
       if (subs.length === 0) {
-        const cost = batch.firstBuyPrice || 0;
-        return { totalCost: 0, totalShares: 0, avgCost: cost, marketValue: 0, pnlAmount: 0, pnlRate: 0, deductionCount: subs.length };
+        // 没有追加扣款记录时：使用首次买入价计算简单盈亏率（与钉钉推送保持一致）
+        if (firstBuyPrice > 0 && currentNav > 0) {
+          const simplePnlRate = (currentNav - firstBuyPrice) / firstBuyPrice;
+          return {
+            totalCost: 0,
+            totalShares: 0,
+            avgCost: firstBuyPrice,
+            marketValue: 0,
+            pnlAmount: 0,
+            pnlRate: simplePnlRate,
+            deductionCount: 0,
+            useSimpleCalc: true  // 标记：使用简单计算模式
+          };
+        }
+        return { totalCost: 0, totalShares: 0, avgCost: firstBuyPrice, marketValue: 0, pnlAmount: 0, pnlRate: 0, deductionCount: 0, useSimpleCalc: false };
       }
 
       let totalCost = 0;
@@ -2542,7 +2582,8 @@
           logic: p.logic,
           category: p.category,
           risk: p.risk,
-          grid: { width: 0.05, takeProfit: 0.10, amount: 1000, basePrice: null },
+          // v2: 不再使用固定网格参数
+          grid: { width: 0, takeProfit: 0, amount: 1000, basePrice: null },
           batches: []
         });
         added++;
@@ -2594,94 +2635,128 @@
     }
 
     // ============================================================
-    // 获取基金净值（天天基金 JSONP / 腾讯行情 JSONP）
+    // 获取基金净值（支持日内估算净值）
     // ============================================================
     // ============================================================
-    // 获取最新净值（使用pingzhongdata接口，数据最准确）
+    // 获取最新净值 + 估算净值（使用 fundgz 接口，含 gsz 估算值）
+    // 返回: { price, date, name, estimateNav, estimateTime, gszzl, sourceType }
     // ============================================================
     function fetchLatestNav(code) {
       return new Promise((resolve, reject) => {
+        // 优先使用 fundgz 接口（含估算净值 gsz，支持日内）
+        const script = document.createElement('script');
+        const apiUrl = `https://fundgz.1234567.com.cn/js/${code}.js?rt=${Date.now()}`;
+        const cbName = `_nav${Date.now()}`;
+        window[cbName] = (data) => {
+          cleanup();
+          const nav = parseFloat(data.dwjz) || 0;
+          const estimateNav = parseFloat(data.gsz) || 0;
+          const estimateTime = data.gztime || '';
+          const gszzl = data.gszzl || '';
+          const navDate = data.jzrq || '';
+          const fundName = data.name || '';
+
+          // 判断当前是否为交易时段，决定使用哪个价格
+          const now = new Date();
+          const isTrading = now.getDay() >= 1 && now.getDay() <= 5 &&
+                            ((now.getHours() > 9 || (now.getHours() === 9 && now.getMinutes() >= 30)) &&
+                             now.getHours() < 15);
+          const useEstimate = isTrading && estimateNav > 0;
+
+          console.log(`✅ 基金${code} | 公布净值:${nav}(${navDate}) | 估算:${estimateNav}(${estimateTime}) | 使用:${useEstimate ? '估算' : '公布'}`);
+
+          resolve({
+            price: useEstimate ? estimateNav : nav,
+            date: useEstimate ? estimateTime : navDate,
+            name: fundName,
+            nav: nav,
+            navDate: navDate,
+            estimateNav: estimateNav,
+            estimateTime: estimateTime,
+            gszzl: gszzl,
+            sourceType: useEstimate ? '估算' : '公布'
+          });
+        };
+        function cleanup() {
+          delete window[cbName];
+          if (script.parentNode) script.parentNode.removeChild(script);
+        }
+        script.onerror = () => {
+          cleanup();
+          // 失败则尝试 pingzhongdata 接口
+          fetchLatestNavPingzhong(code).then(resolve).catch(reject);
+        };
+        script.src = apiUrl.replace('jsonpgz', cbName);
+        // 修正：fundgz 接口不支持自定义 callback，直接用 jsonpgz
+        script.src = apiUrl;
+        window.jsonpgz = window[cbName];
+        document.body.appendChild(script);
+        const timeout = setTimeout(() => { cleanup(); fetchLatestNavPingzhong(code).then(resolve).catch(reject); }, 15000);
+      });
+    }
+
+    // 备用：pingzhongdata 接口（无估算净值，但历史数据准确）
+    function fetchLatestNavPingzhong(code) {
+      return new Promise((resolve, reject) => {
         const script = document.createElement('script');
         script.src = `https://fund.eastmoney.com/pingzhongdata/${code}.js?t=${Date.now()}`;
-
-        // 清理函数
         function cleanup() {
           if (script.parentNode) script.parentNode.removeChild(script);
           try { delete window.Data_netWorthTrend; } catch(e) {}
         }
-
-        const timeout = setTimeout(() => {
-          cleanup();
-          // 超时，尝试备用接口
-          fetchFundNavJsonpFallback(code).then(resolve).catch(reject);
-        }, 15000);
-
+        const timeout = setTimeout(() => { cleanup(); reject(new Error('请求超时')); }, 15000);
         script.onload = () => {
           clearTimeout(timeout);
           try {
             const netWorthTrend = window.Data_netWorthTrend || [];
-            if (netWorthTrend.length === 0) {
-              cleanup();
-              fetchFundNavJsonpFallback(code).then(resolve).catch(reject);
-              return;
-            }
-
-            // 获取最后一个数据点（最新净值）
+            if (!netWorthTrend.length) { cleanup(); reject(new Error('数据为空')); return; }
             const latest = netWorthTrend[netWorthTrend.length - 1];
             const date = new Date(latest.x);
-            const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+            const dateStr = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
             const nav = parseFloat(latest.y) || 0;
-
-            console.log(`✅ pingzhongdata接口返回 - 日期: ${dateStr}, 净值: ${nav}`);
-
-            // 同时尝试获取基金名称
             let fundName = '';
             try { fundName = window.fS_name || ''; } catch(e) {}
-
             cleanup();
             resolve({
-              price: nav,
-              date: dateStr,
-              name: fundName
+              price: nav, date: dateStr, name: fundName,
+              nav: nav, navDate: dateStr,
+              estimateNav: null, estimateTime: '', gszzl: '',
+              sourceType: '公布'
             });
           } catch(e) {
             cleanup();
-            fetchFundNavJsonpFallback(code).then(resolve).catch(reject);
+            reject(new Error('数据解析失败: ' + e.message));
           }
         };
-
-        script.onerror = () => {
-          clearTimeout(timeout);
-          cleanup();
-          fetchFundNavJsonpFallback(code).then(resolve).catch(reject);
-        };
-
+        script.onerror = () => { cleanup(); reject(new Error('网络错误')); };
         document.body.appendChild(script);
       });
     }
 
-    // 备用方法：使用 fundgz 接口
-    function fetchFundNavJsonpFallback(code) {
+    // 场内ETF实时价格
+    function fetchEtfPriceJsonp(code) {
       return new Promise((resolve, reject) => {
+        const prefix = (code[0] === '5' || code[0] === '6') ? 'sh' : 'sz';
         const script = document.createElement('script');
-        const apiUrl = `https://fundgz.1234567.com.cn/js/${code}.js?rt=${Date.now()}`;
-        window.jsonpgz = (data) => {
-          console.log('⚠️ 使用备用接口(fundgz)，数据可能有延迟:', data);
-          resolve({
-            price: parseFloat(data.dwjz) || 0,
-            date: data.jzrq || '',
-            name: data.name || ''
-          });
+        const cbName = `_etf${Date.now()}`;
+        window[cbName] = (resp) => {
+          const s = (resp || '').split('=').slice(1).join('=').replace(/^"/, '').replace(/"$/, '');
+          const p = s.split('~');
+          if (p.length >= 4) {
+            resolve({ price: parseFloat(p[3]) || 0, name: p[1] || '', sourceType: '实时' });
+          } else {
+            reject(new Error('行情格式异常'));
+          }
           cleanup();
         };
         function cleanup() {
-          delete window.jsonpgz;
+          delete window[cbName];
           if (script.parentNode) script.parentNode.removeChild(script);
         }
-        script.onerror = () => { cleanup(); reject(new Error('所有接口都失败，请手动输入净值')); };
-        script.src = apiUrl;
+        script.onerror = () => { cleanup(); reject(new Error('网络错误')); };
+        script.src = `http://qt.gtimg.cn/q=${prefix}${code}&cb=${cbName}&_=${Date.now()}`;
         document.body.appendChild(script);
-        setTimeout(() => { cleanup(); reject(new Error('请求超时')); }, 10000);
+        setTimeout(() => { cleanup(); reject(new Error('请求超时')); }, 15000);
       });
     }
 
@@ -3282,14 +3357,15 @@
     }
 
     // ============================================================
-    // 一键刷新所有批次盈亏（基于最新净值重算）
+    // 一键刷新所有批次盈亏（基于最新净值/估算净值重算）
     // ============================================================
     function recalcAllBatchReturns() {
       const data = getData();
       const idx = data.currentFundIndex;
       if (idx < 0 || idx >= data.funds.length) return;
       const fund = data.funds[idx];
-      const price = fund.nav || 0;
+      // v2: 使用 currentPrice（可能是估算净值）
+      const price = fund.currentPrice || fund.nav || 0;
       if (price <= 0) { showToast('❌ 请先获取基金净值', 'error'); return; }
 
       let totalPnl = 0, totalCost = 0, totalMV = 0;
@@ -3349,7 +3425,7 @@
     };
 
     // ============================================================
-    // 刷新当前基金净值 + 自动更新批次 + 收益率
+    // 刷新当前基金净值 + 自动更新批次（支持日内估算净值）
     // ============================================================
     function refreshCurrentFundNav() {
       const data = getData();
@@ -3357,82 +3433,55 @@
       if (idx < 0 || idx >= data.funds.length) return;
       const fund = data.funds[idx];
       const btn = document.getElementById('refreshNavBtn');
-      if (btn) { btn.disabled = true; btn.innerHTML = '<span class="loading-spinner"></span>获取中...'; }
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loading-spinner"></span>获取中...';
 
-      // 场内ETF用fetchEtfPriceJsonp，场外基金用fetchPingzhongData（一次请求同时获取净值+收益率）
-      if (fund.type === '场内') {
-        fetchEtfPriceJsonp(fund.code).then(result => {
-          const newPrice = result.price;
-          const nowStr = new Date().toLocaleString('zh-CN');
-          fund.nav = newPrice;
-          fund.lastUpdate = nowStr;
-          if (result.name) fund.name = result.name;
-          saveData(data);
-          renderFundDetail();
-          if (btn) { btn.disabled = false; btn.innerHTML = '🔄 刷新净值'; }
-          showToast(`✅ ${fund.name} 价格 ${newPrice.toFixed(4)}`, 'success');
-        }).catch(err => {
-          if (btn) { btn.disabled = false; btn.innerHTML = '🔄 刷新净值'; }
-          showToast(`❌ 获取失败：${err.message || err}`, 'error');
-        });
-        return;
-      }
+      // 场外基金用fetchLatestNav（含估算净值），场内ETF用fetchEtfPriceJsonp
+      const task = fund.type === '场外' ? fetchLatestNav(fund.code) : fetchEtfPriceJsonp(fund.code);
 
-      // 场外基金：使用pingzhongdata接口，一次获取净值+收益率
-      fetchPingzhongData(fund.code).then(result => {
-        const allData = result.allData || [];
-        if (allData.length === 0) throw new Error('净值数据为空');
-
-        // 取最后一条作为最新净值
-        const latest = allData[allData.length - 1];
-        const newPrice = latest.netValue;
-        const navDate = latest.date;
+      task.then(result => {
+        const newPrice = result.price;
+        const navDate = result.date || result.navDate || '';
         const nowStr = new Date().toLocaleString('zh-CN');
 
-        fund.nav = newPrice;
-        fund.navDate = navDate;
+        // 保存公布净值和估算净值
+        if (fund.type === '场外') {
+          fund.nav = result.nav || newPrice;           // 公布净值（昨日）
+          fund.navDate = result.navDate || navDate;
+          fund.estimateNav = result.estimateNav || null; // 估算净值（今日）
+          fund.estimateTime = result.estimateTime || '';
+          fund.gszzl = result.gszzl || '';
+          fund.currentPrice = newPrice;                 // 当前使用的价格（可能是估算）
+          fund.priceSource = result.sourceType || '公布';
+        } else {
+          fund.nav = newPrice;
+          fund.navDate = navDate;
+          fund.currentPrice = newPrice;
+          fund.priceSource = '实时';
+        }
         fund.lastUpdate = nowStr;
-        if (result.fundName) fund.name = result.fundName;
-
-        // 同时更新收益率
-        let updated = false;
-        if (result.syl_1y !== undefined && !isNaN(parseFloat(result.syl_1y))) {
-          fund.return1m = parseFloat(result.syl_1y); updated = true;
-        }
-        if (result.syl_1n !== undefined && !isNaN(parseFloat(result.syl_1n))) {
-          fund.return1y = parseFloat(result.syl_1n); updated = true;
-        }
+        if (result.name) fund.name = result.name;
 
         saveData(data);
         renderFundDetail();
+        btn.disabled = false;
+        btn.innerHTML = '🔄 刷新净值';
 
-        // 如果有图表数据，同时渲染走势图
-        currentChartData = result;
-        renderNavChart(result, currentTimeRange);
-
-        if (btn) { btn.disabled = false; btn.innerHTML = '🔄 刷新净值'; }
-        const retInfo = updated ? '，收益率已更新' : '';
-        showToast(`✅ ${fund.name} 净值 ${newPrice.toFixed(4)}（${navDate}公布）${retInfo}`, 'success');
+        // 提示信息
+        let msg = `✅ ${fund.name} `;
+        if (fund.estimateNav && fund.priceSource === '估算') {
+          msg += `估算 ${fund.estimateNav.toFixed(4)}（${fund.estimateTime}）`;
+          msg += ` | 公布 ${fund.nav.toFixed(4)}（${fund.navDate}）`;
+        } else {
+          msg += `净值 ${newPrice.toFixed(4)}（${navDate}公布）`;
+        }
+        showToast(msg, 'success');
       }).catch(err => {
-        // pingzhongdata失败，尝试备用接口
-        fetchFundNavJsonpFallback(fund.code).then(result => {
-          const newPrice = result.price;
-          const navDate = result.date || '';
-          const nowStr = new Date().toLocaleString('zh-CN');
-          fund.nav = newPrice;
-          fund.navDate = navDate;
-          fund.lastUpdate = nowStr;
-          if (result.name) fund.name = result.name;
-          saveData(data);
-          renderFundDetail();
-          if (btn) { btn.disabled = false; btn.innerHTML = '🔄 刷新净值'; }
-          showToast(`✅ ${fund.name} 净值 ${newPrice.toFixed(4)}（${navDate}公布）`, 'success');
-        }).catch(err2 => {
-          if (btn) { btn.disabled = false; btn.innerHTML = '🔄 刷新净值'; }
-          const errorMsg = err2.message || err2 || '未知错误';
-          console.error('❌ 获取净值失败:', errorMsg);
-          showToast(`❌ 获取失败：${errorMsg}`, 'error');
-        });
+        btn.disabled = false;
+        btn.innerHTML = '🔄 刷新净值';
+        const errorMsg = err.message || err || '未知错误';
+        console.error('❌ 获取净值失败:', errorMsg);
+        showToast(`❌ 获取失败：${errorMsg}`, 'error');
       });
     }
 
@@ -3494,7 +3543,8 @@
               name: tf.name, code: tf.code, type: tf.type, nav: tf.nav,
               category: tf.category, risk: tf.risk,
               return1m: undefined, return1y: undefined, logic:'',
-              grid: { width:0.05, takeProfit:0.10, amount:1000, basePrice:tf.nav },
+              // v2: 不再使用固定网格参数
+              grid: { width:0, takeProfit:0, amount:1000, basePrice:tf.nav },
               batches: []
             });
             changed = true;
@@ -3512,6 +3562,39 @@
 
       renderFundSelector();
       // 尝试自动同步 grid_data.json（仅 HTTP 环境）
+      // 内置数据兜底：以内置 EMBEDDED_DATA 为权威基金列表（新增基金一定显示），
+      // 并合并用户在网页 UI 中手动添加的批次/subRecords，避免丢失手动登记。
+      function ensureEmbeddedSync() {
+        try {
+          if (!EMBEDDED_DATA || !Array.isArray(EMBEDDED_DATA.funds)) return;
+          const local = getData();
+          const localMap = {};
+          (local.funds || []).forEach(f => { localMap[f.code] = f; });
+
+          const mergedFunds = EMBEDDED_DATA.funds.map(ef => {
+            const lf = localMap[ef.code];
+            if (!lf) return ef;                       // 新增基金，直接用内置
+            const out = JSON.parse(JSON.stringify(ef));
+            const embBatchKey = new Set((ef.batches || []).map(b => (b.date||'') + '|' + (b.firstBuyPrice||'')));
+            (lf.batches || []).forEach(b => {
+              if (!embBatchKey.has((b.date||'') + '|' + (b.firstBuyPrice||''))) out.batches.push(b);
+            });
+            const embSubKey = new Set((ef.subRecords || []).map(s => JSON.stringify(s)));
+            (lf.subRecords || []).forEach(s => {
+              if (!embSubKey.has(JSON.stringify(s))) out.subRecords.push(s);
+            });
+            return out;
+          });
+
+          const newData = JSON.parse(JSON.stringify(EMBEDDED_DATA));
+          newData.funds = mergedFunds;
+          if (typeof local.currentFundIndex === 'number' && local.currentFundIndex >= 0 && local.currentFundIndex < mergedFunds.length) {
+            newData.currentFundIndex = local.currentFundIndex;
+          }
+          saveData(newData);
+        } catch (e) { console.warn('ensureEmbeddedSync 失败', e); }
+      }
+      ensureEmbeddedSync();
       tryAutoSync();
 
       initTimeRangeTabs();
@@ -3531,8 +3614,12 @@
         selectFund(data.currentFundIndex);
         
         // 延迟一点，确保 renderFundDetail() 已经完成，按钮已创建
-        // refreshCurrentFundNav 内部会调用 fetchPingzhongData，一次请求同时获取净值+收益率+走势图
-        setTimeout(() => refreshCurrentFundNav(), 800);
+        setTimeout(() => {
+          // 自动获取最新净值
+          refreshCurrentFundNav();
+          // 加载走势图
+          fetchAndRenderChart(true);
+        }, 800);
       }
     });
 
