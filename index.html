@@ -1580,7 +1580,7 @@
       const priceSource = fund.priceSource || '公布';
       let html = '';
       let currentMonth = '';
-      const sorted = [...batches].sort((a, b) => a.date.localeCompare(b.date));
+      const sorted = [...items].sort((a, b) => a.date.localeCompare(b.date));
 
       sorted.forEach((item) => {
         const b = item.batch;
