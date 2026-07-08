@@ -1343,6 +1343,97 @@
         return1m: 8.38,
         return1y: 98.01,
         logic: '跟踪上证科创50指数，投资科创板头部科技企业。聚焦半导体、人工智能、生物医药等硬科技领域。'
+      },
+      // ===== 以下为台账基金补全元数据（9只）=====
+      {
+        name: '华安品质甄选混合C',
+        code: '013681',
+        type: '场外',
+        category: '混合型-偏股',
+        risk: 'R4中高风险',
+        return1m: -0.32,
+        return1y: 64.54,
+        logic: '由基金经理刘畅畅管理，股票资产60%-95%灵活配置。聚焦优质成长企业，兼顾价值与成长，深耕制造业升级与消费复苏双主线。'
+      },
+      {
+        name: '富国中证A500ETF发起式联接C',
+        code: '022464',
+        type: '场外',
+        category: '中证A500指数',
+        risk: 'R3中风险',
+        return1m: 0.61,
+        return1y: 29.57,
+        logic: '新"国九条"后重磅宽基指数联接基金，紧跟经济高质量发展脉络。成分行业龙头，风格兼顾价值与成长，一键布局A股核心资产。'
+      },
+      {
+        name: '广发科创50ETF发起式联接A',
+        code: '013810',
+        type: '场外',
+        category: '科创50指数',
+        risk: 'R4中高风险',
+        return1m: -9.17,
+        return1y: 98.19,
+        logic: '联接广发科创50ETF，聚焦科创板头部硬科技企业。半导体国产化推进、智能驾驶落地，自主可控概念含量高。'
+      },
+      {
+        name: '广发沪深300ETF',
+        code: '510360',
+        type: '场内',
+        category: '沪深300指数',
+        risk: 'R3中风险',
+        return1m: -3.70,
+        return1y: 23.40,
+        logic: '跟踪沪深300指数，A股核心蓝筹标杆。涵盖金融、消费、医药等各行业龙头企业，适合作为组合底仓配置。'
+      },
+      {
+        name: '广发中证A500ETF',
+        code: '563800',
+        type: '场内',
+        category: '中证A500指数',
+        risk: 'R3中风险',
+        return1m: -3.44,
+        return1y: 31.20,
+        logic: '场内直接投资中证A500指数，紧密跟踪新国九条宽基。成分股覆盖各行业龙头，流动性好，交易便捷。'
+      },
+      {
+        name: '广发创业板ETF',
+        code: '159952',
+        type: '场内',
+        category: '创业板指数',
+        risk: 'R4中高风险',
+        return1m: 6.80,
+        return1y: 85.40,
+        logic: '场内直接跟踪创业板指，覆盖新能源、数字经济、绿色低碳三大赛道高成长企业。当前估值位于相对低位。'
+      },
+      {
+        name: '广发科创50ETF',
+        code: '588060',
+        type: '场内',
+        category: '科创50指数',
+        risk: 'R4中高风险',
+        return1m: 8.90,
+        return1y: 105.50,
+        logic: '场内直接投资科创50指数，聚焦半导体、人工智能、生物科技等硬核科技领域。波动较大但长期成长空间广阔。'
+      },
+      {
+        name: '广发上海金ETF',
+        code: '518600',
+        type: '场内',
+        category: '另类-黄金',
+        risk: 'R4中高风险',
+        return1m: -3.80,
+        return1y: 28.90,
+        logic: '场内直接投资黄金，全球地缘政治紧张背景下避险属性凸显。能有效对冲组合风险，降低回撤。'
+      },
+      {
+        name: '鹏华产业债债券A',
+        code: '206018',
+        type: '场外',
+        category: '债券型-纯债',
+        risk: '中低风险',
+        return1m: 0.12,
+        return1y: 4.28,
+        logic: '专注产业债投资的纯债基金，不投股票。主要持有金融债、公司债、企业债等高等级信用债，收益稳健，适合保守型投资者。'
       }
     ];
 
@@ -1350,7 +1441,7 @@
     // 数据存储
     // ============================================================
     const STORAGE_KEY = 'grid_trading_data_v2';
-    const EMBEDDED_DATA = {"funds": [{"name": "广发科创50ETF发起式联接A", "code": "013810", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发沪深300ETF", "code": "510360", "type": "场内", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发中证A500ETF", "code": "563800", "type": "场内", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发创业板ETF", "code": "159952", "type": "场内", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发科创50ETF", "code": "588060", "type": "场内", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发上海金ETF", "code": "518600", "type": "场内", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "招商中证红利ETF联接A", "code": "012643", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "主要投资银行、公用事业、钢铁等传统高股息资产，防御属性突出。利率下行阶段高股息资产防御价值凸显。", "category": "红利指数", "risk": "R3中风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发创业板ETF发起式联接C", "code": "003766", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "定位于服务高成长性、创新型中小企业。行业集中于新能源、数字经济、绿色低碳三大赛道。当前估值位于相对低位。", "category": "创业板指数", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发上海金ETF联接C", "code": "008987", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "全球动荡、地缘政治持续紧张。黄金作为避险资产的作用不断凸显。能有效降低组合回撤。", "category": "另类-黄金", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "易方达中证1000量化增强A", "code": "017094", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "股票型", "risk": "中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-06-18", "firstBuyPrice": 1.7707, "unitAmount": 20000.0, "gridLine": 1.6646, "note": "三明客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "易方达安心回报债券B", "code": "110028", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "债券型", "risk": "中低风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-06-18", "firstBuyPrice": 2.3088, "unitAmount": 20000.0, "gridLine": 2.1785, "note": "三明客户", "subRecords": [], "expanded": false}, {"date": "2026-07-03", "firstBuyPrice": 2.3076, "unitAmount": 1000000.0, "gridLine": 2.1785, "note": "潘天妹客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "广发科创50ETF发起式联接C", "code": "013811", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "存储芯片迎来涨价潮，智能驾驶出租车正式投放。中报业绩向好背景下，科创50聚焦头部硬核科技+软创新，自主可控概念含量高。", "category": "科创50指数", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-07-03", "firstBuyPrice": 1.3646, "unitAmount": 500000.0, "gridLine": 1.2964, "note": "潘天妹客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "华安品质甄选混合C", "code": "013681", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "混合-偏股", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-07-08", "firstBuyPrice": 1.5715, "unitAmount": 150000.0, "gridLine": 1.4925, "note": "榕管客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "富国中证A500ETF发起式联接C", "code": "022464", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "宽基指数", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-05-25", "firstBuyPrice": 1.3201, "unitAmount": 400000.0, "gridLine": 1.2541, "note": "榕管客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "鹏华产业债债券A", "code": "206018", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [], "strategyMode": "balanced"}], "currentFundIndex": 0, "lastSync": "2026-07-08 14:45:57", "intradayMode": false, "_embeddedVersion": "20260708171520"};
+    const EMBEDDED_DATA = {"funds": [{"name": "广发科创50ETF发起式联接A", "code": "013810", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发沪深300ETF", "code": "510360", "type": "场内", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发中证A500ETF", "code": "563800", "type": "场内", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发创业板ETF", "code": "159952", "type": "场内", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发科创50ETF", "code": "588060", "type": "场内", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发上海金ETF", "code": "518600", "type": "场内", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "招商中证红利ETF联接A", "code": "012643", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "主要投资银行、公用事业、钢铁等传统高股息资产，防御属性突出。利率下行阶段高股息资产防御价值凸显。", "category": "红利指数", "risk": "R3中风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发创业板ETF发起式联接C", "code": "003766", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "定位于服务高成长性、创新型中小企业。行业集中于新能源、数字经济、绿色低碳三大赛道。当前估值位于相对低位。", "category": "创业板指数", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发上海金ETF联接C", "code": "008987", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "全球动荡、地缘政治持续紧张。黄金作为避险资产的作用不断凸显。能有效降低组合回撤。", "category": "另类-黄金", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "易方达中证1000量化增强A", "code": "017094", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "股票型", "risk": "中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-06-18", "firstBuyPrice": 1.7707, "unitAmount": 20000.0, "gridLine": 1.6646, "note": "三明客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "易方达安心回报债券B", "code": "110028", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "债券型", "risk": "中低风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-06-18", "firstBuyPrice": 2.3088, "unitAmount": 20000.0, "gridLine": 2.1785, "note": "三明客户", "subRecords": [], "expanded": false}, {"date": "2026-07-03", "firstBuyPrice": 2.3076, "unitAmount": 1000000.0, "gridLine": 2.1785, "note": "潘天妹客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "广发科创50ETF发起式联接C", "code": "013811", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "存储芯片迎来涨价潮，智能驾驶出租车正式投放。中报业绩向好背景下，科创50聚焦头部硬核科技+软创新，自主可控概念含量高。", "category": "科创50指数", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-07-03", "firstBuyPrice": 1.3646, "unitAmount": 500000.0, "gridLine": 1.2964, "note": "潘天妹客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "华安品质甄选混合C", "code": "013681", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "混合-偏股", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-07-08", "firstBuyPrice": 1.5715, "unitAmount": 150000.0, "gridLine": 1.4925, "note": "榕管客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "富国中证A500ETF发起式联接C", "code": "022464", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "宽基指数", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-05-25", "firstBuyPrice": 1.3201, "unitAmount": 400000.0, "gridLine": 1.2541, "note": "榕管客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "鹏华产业债债券A", "code": "206018", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [], "strategyMode": "balanced"}], "currentFundIndex": 0, "lastSync": "2026-07-08 14:45:57", "intradayMode": false, "_embeddedVersion": "20260708173416"};
 
 
     // 用内嵌的 EMBEDDED_DATA 校准 localStorage：
