@@ -103,6 +103,7 @@
     .btn-secondary:hover { background: #dde2e6; }
 
     .btn-sm { padding: 5px 12px; font-size: 13px; }
+    .btn.active { background: var(--primary); color: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
 
     /* 卡片 */
     .card {
@@ -985,6 +986,10 @@
         <div class="card-header">
           <span>批次台账</span>
           <div style="display:flex; gap:8px; align-items:center;">
+            <div style="display:flex; gap:2px; background:#f0f4f8; border-radius:6px; padding:2px; margin-right:4px;">
+              <button class="btn btn-sm active" id="btnViewCurrent" onclick="switchBatchView('current')" style="border:none;background:transparent;">当前基金</button>
+              <button class="btn btn-sm" id="btnViewAll" onclick="switchBatchView('all')" style="border:none;background:transparent;">全部批次</button>
+            </div>
             <div class="strategy-tabs" style="display:flex; gap:2px; background:#f0f4f8; border-radius:6px; padding:2px; margin-right:8px;">
               <button class="strategy-tab active" data-mode="balanced" onclick="switchStrategyMode('balanced', this)" title="各因子平衡，适合大多数用户">🛡️ 稳健</button>
               <button class="strategy-tab" data-mode="aggressive" onclick="switchStrategyMode('aggressive', this)" title="加大趋势/动量权重，更积极">🚀 进取</button>
@@ -1000,6 +1005,7 @@
               <thead>
                 <tr>
                   <th style="width:30px;"></th>
+                  <th>基金</th>
                   <th>首次扣款日期</th>
                   <th>持仓成本</th>
                   <th>总投入</th>
@@ -1012,7 +1018,7 @@
                 </tr>
               </thead>
               <tbody id="batchTableBody">
-                <tr><td colspan="10" style="color:#999;">暂无批次数据</td></tr>
+                <tr><td colspan="11" style="color:#999;">暂无批次数据</td></tr>
               </tbody>
             </table>
           </div>
@@ -1344,7 +1350,7 @@
     // 数据存储
     // ============================================================
     const STORAGE_KEY = 'grid_trading_data_v2';
-    const EMBEDDED_DATA = {"funds": [{"name": "广发科创50ETF发起式联接A", "code": "013810", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发沪深300ETF", "code": "510360", "type": "场内", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发中证A500ETF", "code": "563800", "type": "场内", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发创业板ETF", "code": "159952", "type": "场内", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发科创50ETF", "code": "588060", "type": "场内", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发上海金ETF", "code": "518600", "type": "场内", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "招商中证红利ETF联接A", "code": "012643", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "主要投资银行、公用事业、钢铁等传统高股息资产，防御属性突出。利率下行阶段高股息资产防御价值凸显。", "category": "红利指数", "risk": "R3中风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发创业板ETF发起式联接C", "code": "003766", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "定位于服务高成长性、创新型中小企业。行业集中于新能源、数字经济、绿色低碳三大赛道。当前估值位于相对低位。", "category": "创业板指数", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发上海金ETF联接C", "code": "008987", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "全球动荡、地缘政治持续紧张。黄金作为避险资产的作用不断凸显。能有效降低组合回撤。", "category": "另类-黄金", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "易方达中证1000量化增强A", "code": "017094", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "股票型", "risk": "中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-06-18", "firstBuyPrice": 1.7707, "unitAmount": 20000.0, "gridLine": 1.6646, "note": "三明客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "易方达安心回报债券B", "code": "110028", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "债券型", "risk": "中低风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-06-18", "firstBuyPrice": 2.3088, "unitAmount": 20000.0, "gridLine": 2.1785, "note": "三明客户", "subRecords": [], "expanded": false}, {"date": "2026-07-03", "firstBuyPrice": 2.3076, "unitAmount": 1000000.0, "gridLine": 2.1785, "note": "潘天妹客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "广发科创50ETF发起式联接C", "code": "013811", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "存储芯片迎来涨价潮，智能驾驶出租车正式投放。中报业绩向好背景下，科创50聚焦头部硬核科技+软创新，自主可控概念含量高。", "category": "科创50指数", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-07-03", "firstBuyPrice": 1.3646, "unitAmount": 500000.0, "gridLine": 1.2964, "note": "潘天妹客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "招商中证红利ETF联接A", "code": "012643", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "主要投资银行、公用事业、钢铁等传统高股息资产，防御属性突出。利率下行阶段高股息资产防御价值凸显。", "category": "红利指数", "risk": "R3中风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发创业板ETF发起式联接C", "code": "003766", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "定位于服务高成长性、创新型中小企业。行业集中于新能源、数字经济、绿色低碳三大赛道。当前估值位于相对低位。", "category": "创业板指数", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发上海金ETF联接C", "code": "008987", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "全球动荡、地缘政治持续紧张。黄金作为避险资产的作用不断凸显。能有效降低组合回撤。", "category": "另类-黄金", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "易方达中证1000量化增强A", "code": "017094", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "股票型", "risk": "中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-06-18", "firstBuyPrice": 1.7707, "unitAmount": 20000.0, "gridLine": 1.6646, "note": "三明客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "广发科创50ETF发起式联接C", "code": "013811", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "存储芯片迎来涨价潮，智能驾驶出租车正式投放。中报业绩向好背景下，科创50聚焦头部硬核科技+软创新，自主可控概念含量高。", "category": "科创50指数", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-07-03", "firstBuyPrice": 1.3646, "unitAmount": 500000.0, "gridLine": 1.2964, "note": "潘天妹客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "华安品质甄选混合C", "code": "013681", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "混合-偏股", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-07-08", "firstBuyPrice": 1.5715, "unitAmount": 150000.0, "gridLine": 1.4925, "note": "榕管客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "富国中证A500ETF发起式联接C", "code": "022464", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "宽基指数", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-05-25", "firstBuyPrice": 1.3201, "unitAmount": 400000.0, "gridLine": 1.2541, "note": "榕管客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "鹏华产业债债券A", "code": "206018", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [], "strategyMode": "balanced"}], "currentFundIndex": 0, "lastSync": "2026-07-08 14:32:20", "intradayMode": false};
+    const EMBEDDED_DATA = {"funds": [{"name": "广发科创50ETF发起式联接A", "code": "013810", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发沪深300ETF", "code": "510360", "type": "场内", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发中证A500ETF", "code": "563800", "type": "场内", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发创业板ETF", "code": "159952", "type": "场内", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发科创50ETF", "code": "588060", "type": "场内", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发上海金ETF", "code": "518600", "type": "场内", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "nan", "grid": {"width": 0, "takeProfit": 0, "amount": NaN, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "招商中证红利ETF联接A", "code": "012643", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "主要投资银行、公用事业、钢铁等传统高股息资产，防御属性突出。利率下行阶段高股息资产防御价值凸显。", "category": "红利指数", "risk": "R3中风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发创业板ETF发起式联接C", "code": "003766", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "定位于服务高成长性、创新型中小企业。行业集中于新能源、数字经济、绿色低碳三大赛道。当前估值位于相对低位。", "category": "创业板指数", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "广发上海金ETF联接C", "code": "008987", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "全球动荡、地缘政治持续紧张。黄金作为避险资产的作用不断凸显。能有效降低组合回撤。", "category": "另类-黄金", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [], "strategyMode": "balanced"}, {"name": "易方达中证1000量化增强A", "code": "017094", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "股票型", "risk": "中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-06-18", "firstBuyPrice": 1.7707, "unitAmount": 20000.0, "gridLine": 1.6646, "note": "三明客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "易方达安心回报债券B", "code": "110028", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "债券型", "risk": "中低风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-06-18", "firstBuyPrice": 2.3088, "unitAmount": 20000.0, "gridLine": 2.1785, "note": "三明客户", "subRecords": [], "expanded": false}, {"date": "2026-07-03", "firstBuyPrice": 2.3076, "unitAmount": 1000000.0, "gridLine": 2.1785, "note": "潘天妹客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "广发科创50ETF发起式联接C", "code": "013811", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "存储芯片迎来涨价潮，智能驾驶出租车正式投放。中报业绩向好背景下，科创50聚焦头部硬核科技+软创新，自主可控概念含量高。", "category": "科创50指数", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-07-03", "firstBuyPrice": 1.3646, "unitAmount": 500000.0, "gridLine": 1.2964, "note": "潘天妹客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "华安品质甄选混合C", "code": "013681", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "混合-偏股", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-07-08", "firstBuyPrice": 1.5715, "unitAmount": 150000.0, "gridLine": 1.4925, "note": "榕管客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "富国中证A500ETF发起式联接C", "code": "022464", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "宽基指数", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [{"date": "2026-05-25", "firstBuyPrice": 1.3201, "unitAmount": 400000.0, "gridLine": 1.2541, "note": "榕管客户", "subRecords": [], "expanded": false}], "strategyMode": "balanced"}, {"name": "鹏华产业债债券A", "code": "206018", "type": "场外", "nav": null, "return1m": null, "return1y": null, "logic": "nan", "category": "nan", "risk": "R4中高风险", "grid": {"width": 0, "takeProfit": 0, "amount": 1000.0, "basePrice": null}, "batches": [], "strategyMode": "balanced"}], "currentFundIndex": 0, "lastSync": "2026-07-08 14:32:20", "intradayMode": false};
 
 
     function getData() {
@@ -1536,12 +1542,21 @@
       renderBatchTable(fund);
     }
 
-    function renderBatchTable(fund) {
+    function renderBatchTable(fund, mode) {
       const tbody = document.getElementById('batchTableBody');
-      const batches = fund.batches || [];
+      mode = mode || window.__batchViewMode || 'current';
+      let items = [];
+      if (mode === 'all') {
+        const data = getData();
+        data.funds.forEach(f => {
+          (f.batches || []).forEach(b => items.push({ batch: b, fund: f }));
+        });
+      } else {
+        (fund.batches || []).forEach(b => items.push({ batch: b, fund: fund }));
+      }
 
-      if (batches.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" style="color:#999;">暂无批次数据，点击"添加批次"创建</td></tr>';
+      if (items.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="11" style="color:#999;">暂无批次数据，点击"添加批次"创建</td></tr>';
         return;
       }
 
@@ -1552,11 +1567,15 @@
       let currentMonth = '';
       const sorted = [...batches].sort((a, b) => a.date.localeCompare(b.date));
 
-      sorted.forEach((b) => {
-        const originalIdx = batches.indexOf(b);
+      sorted.forEach((item) => {
+        const b = item.batch;
+        const fcode = String(item.fund.code || '').trim();
+        const fname = item.fund.name || '';
+        const fIdx = getData().funds.indexOf(item.fund);
+        const originalIdx = item.fund.batches.indexOf(b);
         const month = b.date.substring(0, 7);
         const monthLabel = month.replace('-', '年') + '月';
-        if (month !== currentMonth) { currentMonth = month; html += `<tr class="month-divider"><td colspan="10">${monthLabel}</td></tr>`; }
+        if (month !== currentMonth) { currentMonth = month; html += `<tr class="month-divider"><td colspan="11">${monthLabel}</td></tr>`; }
 
         const summary = calcBatchSummary(b, currentNav);
         const subs = b.subRecords || [];
@@ -1572,7 +1591,8 @@
 
         html += `
           <tr class="batch-main-row">
-            <td><span class="expand-btn ${isExpanded ? 'expanded' : ''}" onclick="toggleBatchExpand(${originalIdx})">▶</span></td>
+            <td><span class="expand-btn ${isExpanded ? 'expanded' : ''}" onclick="toggleBatchExpand(${fIdx}, ${originalIdx})">▶</span></td>
+            <td style="font-weight:600;color:#1e293b;">${fcode}<br><small style="color:#64748b;font-weight:400;font-size:11px;">${fname}</small></td>
             <td>${b.date}<br><small style="color:#94a3b8;font-weight:400;">${subs.length}笔扣款</small></td>
             <td>${summary.avgCost > 0 ? summary.avgCost.toFixed(4) : (b.firstBuyPrice ? b.firstBuyPrice.toFixed(4) : '-')}</td>
             <td>${isSimpleMode ? '<span style="color:#94a3b8;">-</span>' : '¥' + summary.totalCost.toFixed(0)}</td>
@@ -1596,10 +1616,11 @@
 
         // 展开的子行
         if (isExpanded && subs.length > 0) {
-          html += `<tr class="sub-record-header"><td></td><td>扣款日期</td><td>净值</td><td>金额</td><td>份额</td><td colspan="2">占比</td><td></td><td></td><td></td></tr>`;
+          html += `<tr class="sub-record-header"><td></td><td></td><td>扣款日期</td><td>净值</td><td>金额</td><td>份额</td><td colspan="2">占比</td><td></td><td></td><td></td></tr>`;
           subs.forEach((sub, subIdx) => {
             const ratio = summary.totalCost > 0 ? (sub.amount / summary.totalCost * 100).toFixed(1) : 0;
             html += `<tr class="sub-record-row">
+              <td></td>
               <td></td>
               <td class="sub-indent">📋 ${sub.date}</td>
               <td>${sub.price.toFixed(4)}</td>
@@ -1614,6 +1635,7 @@
           // 汇总行
           html += `<tr class="sub-record-row" style="background:#eef2ff;font-weight:600;">
             <td></td>
+            <td></td>
             <td class="sub-indent" style="color:var(--primary);">📊 合计</td>
             <td>-</td>
             <td style="color:var(--primary);">¥${summary.totalCost.toFixed(0)}</td>
@@ -1627,6 +1649,15 @@
       });
 
       tbody.innerHTML = html;
+    }
+
+    function switchBatchView(mode) {
+      window.__batchViewMode = mode;
+      document.getElementById('btnViewCurrent').classList.toggle('active', mode === 'current');
+      document.getElementById('btnViewAll').classList.toggle('active', mode === 'all');
+      const data = getData();
+      const fund = data.funds[data.currentFundIndex];
+      renderBatchTable(fund, mode);
     }
 
     // ============================================================
@@ -2129,7 +2160,7 @@
       // 重新渲染批次表格（触发重新计算建议）
       const data = getData();
       const fund = data.funds[data.currentFundIndex];
-      if (fund) renderBatchTable(fund);
+      if (fund) renderBatchTable(fund, window.__batchViewMode || 'current');
       showToast(`已切换为【${mode==='aggressive'?'进取型':mode==='conservative'?'保守型':'稳健型'}】策略`, 'success');
     }
 
@@ -2366,13 +2397,13 @@
       renderFundDetail();
     }
 
-    function toggleBatchExpand(batchIdx) {
+    function toggleBatchExpand(fundIdx, batchIdx) {
       const data = getData();
-      const fund = data.funds[data.currentFundIndex];
+      const fund = data.funds[fundIdx];
       if (!fund || !fund.batches[batchIdx]) return;
       fund.batches[batchIdx].expanded = !fund.batches[batchIdx].expanded;
       saveData(data);
-      renderBatchTable(fund);
+      renderBatchTable(fund, window.__batchViewMode || 'current');
     }
 
     // ============================================================
@@ -3490,6 +3521,34 @@
       });
     }
 
+    // 加载时静默抓取所有基金净值（供「全部批次」视图正确计算市值）
+    function fetchAllFundsNav() {
+      const data = getData();
+      data.funds.forEach((fund, i) => {
+        const task = fund.type === '场外' ? fetchLatestNav(fund.code) : fetchEtfPriceJsonp(fund.code);
+        task.then(result => {
+          const newPrice = result.price;
+          if (fund.type === '场外') {
+            fund.nav = result.nav || newPrice;
+            fund.estimateNav = result.estimateNav || null;
+            fund.gszzl = result.gszzl || '';
+            fund.currentPrice = newPrice;
+            fund.priceSource = result.sourceType || '公布';
+          } else {
+            fund.nav = newPrice;
+            fund.currentPrice = newPrice;
+            fund.priceSource = '实时';
+          }
+          if (result.name) fund.name = result.name;
+          saveData(data);
+          // 静默刷新批次表（当前视图）
+          const cf = getData();
+          const cur = cf.funds[cf.currentFundIndex];
+          renderBatchTable(cur, window.__batchViewMode || 'current');
+        }).catch(() => { /* 单只失败不影响其他 */ });
+      });
+    }
+
     // 手动输入/修改最新净值
     function promptUpdateNav() {
       const data = getData();
@@ -3625,6 +3684,9 @@
           // 加载走势图
           fetchAndRenderChart(true);
         }, 800);
+
+        // 静默抓取所有基金净值（供「全部批次」视图正确计算市值）
+        setTimeout(() => { fetchAllFundsNav(); }, 1200);
       }
     });
 
