@@ -1837,11 +1837,11 @@
 
       // 根据策略模式调整权重
       const weights = {
-        // 7因子 + 网格扣款线(第8因子)。网格权重在三种策略下均为最高梯队（仅低于仓位），确保跌破扣款线能驱动补仓
-        balanced:      { trend:0.16, momentum:0.10, volatility:0.07, market:0.16, position:0.20, valuation:0.08, deviation:0.05, grid:0.18 },
-        aggressive:    { trend:0.22, momentum:0.14, volatility:0.06, market:0.12, position:0.16, valuation:0.04, deviation:0.04, grid:0.22 },
-        conservative:   { trend:0.10, momentum:0.07, volatility:0.05, market:0.16, position:0.26, valuation:0.13, deviation:0.08, grid:0.15 },
-      }[MODE] || { trend:0.16, momentum:0.10, volatility:0.07, market:0.16, position:0.20, valuation:0.08, deviation:0.05, grid:0.18 };
+        // 7因子 + 网格扣款线(第8因子)。仓位盈亏(position)权重已归零（仅作文字参考，不参与评分），腾出份额主要给网格因子
+        balanced:      { trend:0.18, momentum:0.12, volatility:0.08, market:0.18, position:0.00, valuation:0.10, deviation:0.06, grid:0.28 },
+        aggressive:    { trend:0.24, momentum:0.16, volatility:0.07, market:0.14, position:0.00, valuation:0.05, deviation:0.05, grid:0.30 },
+        conservative:   { trend:0.12, momentum:0.09, volatility:0.06, market:0.18, position:0.00, valuation:0.15, deviation:0.10, grid:0.27 },
+      }[MODE] || { trend:0.18, momentum:0.12, volatility:0.08, market:0.18, position:0.00, valuation:0.10, deviation:0.06, grid:0.28 };
 
       // ---- 各因子评分 (-100 ~ +100) ----
 
